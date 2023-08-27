@@ -1,0 +1,21 @@
+let data = `<_device>:/Sysdb/interface/status/eth/phy/slice/*/intfStatus/*`
+let res = newDict()
+for cell in data{
+    for interface, value in cell{
+        let adminState = merge(value)["enabledState"]["Name"]
+        let phyState = merge(value)["operStatus"]["Name"]
+        # if an interface was never shutdown the state is unknownEnabledState
+        if adminState == "unknownEnabledState"{
+            let adminState = "enabled"
+        }
+        if phyState == "intfOperDown"{
+            let phyState = "NotConnected" 
+        }
+        if adminState == "enabled"{
+            if phyState == "NotConnected"{
+                res[interface] = newDict() | setFields("Admin Status", adminState) | setFields("Link State", phyState)
+    }
+}
+}
+}
+res
