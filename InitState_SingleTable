@@ -1,0 +1,26 @@
+let data = `*:/Sysdb/interface/status/eth/phy/slice/1/intfStatus/*`
+let res = newDict()
+for key, value in data{
+    let hostraw = `analytics:/DatasetInfo/Devices`
+    let hostdata = merge(hostraw)
+    if dictHasKey(hostdata, key){
+        let hostname = hostdata[key]["hostname"]
+    }
+    for int, stat in value{
+            let adminState = merge(stat)["enabledState"]["Name"]
+            let phyState = merge(stat)["operStatus"]["Name"]
+
+            if adminState == "unknownEnabledState"{
+                let adminState = "enabled"
+            }
+            if phyState == "intfOperDown"{
+                let phyState = "NotConnected" 
+            }
+            if adminState == "enabled"{
+                if phyState == "NotConnected"{
+                    res[hostname] = newDict() | setFields("Interface", int) | setFields("Status",adminState) | setFields("Link Status", phyState)
+    }
+}
+}
+}
+res
